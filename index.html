@@ -3,59 +3,318 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Responsive Grid Layout</title>
-    <!-- Load Tailwind CSS CDN for utility-first styling -->
+    <title>The Gemini Quiz App</title>
+    <!-- Load Tailwind CSS for modern, responsive styling -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Link to the external CSS file -->
-    <link rel="stylesheet" href="style.css">
+    <style>
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #212121;
+        }
+     
+        .option-label {
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+            @apply block w-full p-4 mb-3 border border-gray-300 rounded-lg bg-white hover:bg-indigo-50 hover:border-indigo-500 shadow-sm;
+        }
+  
+        .option-label input:checked + span {
+            @apply bg-indigo-500 text-white font-semibold shadow-md;
+        }
+ 
+        .option-label input[type="radio"] {
+            display: none;
+        }
+        .option-label span {
+
+            @apply block w-full p-2 rounded-md flex items-start; 
+        }
+    </style>
 </head>
-<body class="min-h-screen p-4 md:p-8">
+<body class="flex items-center justify-center min-h-screen p-4">
 
-    <div class="space-y-4 lg:grid lg:grid-cols-4 lg:gap-4 lg:space-y-0 max-w-7xl mx-auto">
 
-        <header class="content-section bg-indigo-600 text-white lg:col-span-4">
-            <h1 class="text-3xl font-bold">Responsive Web Application Header</h1>
-            <p class="mt-1 text-indigo-200">This layout adapts smoothly from mobile to desktop.</p>
-        </header>
-        <aside class="content-section bg-white border border-gray-200 lg:col-span-1">
-            <h2 class="text-xl font-semibold text-gray-800 mb-4">Sidebar Navigation</h2>
-            <nav>
-                <ul class="space-y-2">
-                    <li><a href="#" class="block text-indigo-600 hover:text-indigo-800 font-medium">Dashboard</a></li>
-                    <li><a href="#" class="block text-indigo-600 hover:text-indigo-800 font-medium">Analytics</a></li>
-                    <li><a href="#" class="block text-indigo-600 hover:text-indigo-800 font-medium">Settings</a></li>
-                    <li><a href="#" class="block text-indigo-600 hover:text-indigo-800 font-medium">Reports</a></li>
-                </ul>
-            </nav>
-        </aside>
+    <div id="quiz-container" class="w-full max-w-lg bg-white p-8 rounded-xl shadow-2xl border-t-4 border-indigo-600">
 
-        <main class="content-section bg-white border border-gray-200 lg:col-span-3">
-            <h2 class="text-2xl font-semibold text-gray-800 mb-3">Main Content Area</h2>
-            <p class="text-gray-600 mb-4">
-                This area contains the primary information. On smaller screens, this section stacks neatly below the sidebar.
-            </p>
+        <h1 class="text-3xl font-extrabold text-gray-800 mb-6 text-center">
+            General Knowledge Quiz
+        </h1>
 
-            <h3 class="text-xl font-medium mb-2">Responsiveness Details</h3>
-            <div class="p-3 bg-gray-50 rounded-lg text-sm">
-                <p class="font-semibold">Current Layout Mode:</p>
-                <ul class="list-disc list-inside ml-4 mt-1 space-y-1">
-                    <li class="hidden sm:block lg:hidden text-orange-600">Tablet/Small Desktop: Still stacking full width.</li>
-                    <li class="block lg:hidden text-red-600">Mobile/Stacking: Full width sections.</li>
-                    <li class="hidden lg:block text-green-600">Desktop/Grid: Sidebar (25%) and Main (75%) are side-by-side.</li>
-                </ul>
-                <p class="mt-2 text-xs">Try resizing your browser window to see the transition!</p>
+
+        <div id="quiz-content">
+            <h2 id="question-text" class="text-xl font-semibold text-gray-700 mb-4"></h2>
+            
+            <div id="options-container" class="space-y-3">
+
             </div>
-            <div class="mt-4 p-4 bg-indigo-50 border-l-4 border-indigo-500 rounded-lg">
-                <p class="text-indigo-700">The grid structure is activated using the `lg:` prefix, which typically corresponds to a screen width of 1024px or larger.</p>
-            </div>
-        </main>
 
-        <footer class="content-section bg-gray-700 text-white text-center lg:col-span-4">
-            <p class="text-sm">
-                &copy; 2025 Responsive Layout Design | All Rights Reserved.
-            </p>
-        </footer>
+            <p id="validation-message" class="text-red-500 text-sm mt-3 h-5"></p>
+
+            <button id="next-btn" class="w-full mt-6 py-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition duration-300 shadow-lg shadow-indigo-200" onclick="checkAnswer()">
+                Next Question
+            </button>
+        </div>
+
+        <div id="results-container" class="hidden text-center">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Quiz Finished!</h2>
+            <p id="final-score" class="text-5xl font-extrabold text-indigo-600 mb-6"></p>
+            <p class="text-gray-600 mb-6">Congratulations on completing the quiz!</p>
+            <button class="py-2 px-6 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600 transition duration-300" onclick="restartQuiz()">
+                Try Again
+            </button>
+        </div>
 
     </div>
+
+    <script>
+        // --- QUIZ DATA ---
+        const quizData = [
+            { 
+                question: "Which of these is NOT a primary color of light (additive colors)?", 
+                options: ["Red", "Green", "Blue", "Yellow"], 
+                correct: "Yellow" 
+            },
+            { 
+                question: "What is the chemical symbol for the element Gold?", 
+                options: ["Ag", "Au", "Fe", "Pb"], 
+                correct: "Au" 
+            },
+            { 
+                question: "In which year did the first human walk on the Moon?", 
+                options: ["1965", "1969", "1971", "1973"], 
+                correct: "1969" 
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let isQuizActive = true;
+
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const nextButton = document.getElementById('next-btn');
+        const validationMessage = document.getElementById('validation-message');
+        const quizContent = document.getElementById('quiz-content');
+        const resultsContainer = document.getElementById('results-container');
+        const finalScore = document.getElementById('final-score');
+
+        function base64ToArrayBuffer(base64) {
+            const binaryString = atob(base64);
+            const len = binaryString.length;
+            const bytes = new Uint8Array(len);
+            for (let i = 0; i < len; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+            return bytes.buffer;
+        }
+
+        function pcmToWav(pcmData, sampleRate) {
+            const numChannels = 1; 
+            const bytesPerSample = 2; 
+            const blockAlign = numChannels * bytesPerSample;
+            const byteRate = sampleRate * blockAlign;
+
+            const buffer = new ArrayBuffer(44 + pcmData.length * bytesPerSample);
+            const view = new DataView(buffer);
+            let offset = 0;
+
+            function writeString(str) {
+                for (let i = 0; i < str.length; i++) {
+                    view.setUint8(offset++, str.charCodeAt(i));
+                }
+            }
+            function writeUint32(val) {
+                view.setUint32(offset, val, true); offset += 4;
+            }
+            function writeUint16(val) {
+                view.setUint16(offset, val, true); offset += 2;
+            }
+
+            writeString('RIFF');
+            writeUint32(36 + pcmData.length * bytesPerSample);
+            writeString('WAVE');
+            writeString('fmt ');
+            writeUint32(16); 
+            writeUint16(1);
+            writeUint16(numChannels);
+            writeUint32(sampleRate);
+            writeUint32(byteRate);
+            writeUint16(blockAlign);
+            writeUint16(bytesPerSample * 8); 
+            writeString('data');
+            writeUint32(pcmData.length * bytesPerSample);
+
+            for (let i = 0; i < pcmData.length; i++) {
+                view.setInt16(offset, pcmData[i], true);
+                offset += bytesPerSample;
+            }
+
+            return new Blob([buffer], { type: 'audio/wav' });
+        }
+
+
+        function loadQuestion() {
+            if (currentQuestionIndex >= quizData.length) {
+                showResults();
+                return;
+            }
+
+            const currentQuestion = quizData[currentQuestionIndex];
+            
+            questionText.textContent = `Question ${currentQuestionIndex + 1}/${quizData.length}: ${currentQuestion.question}`;
+            optionsContainer.innerHTML = ''; 
+            validationMessage.textContent = ''; 
+
+            currentQuestion.options.forEach((option, index) => {
+                const label = document.createElement('label');
+                
+                label.className = 'option-label'; 
+
+                const input = document.createElement('input');
+                input.type = 'radio';
+                input.name = 'answer';
+                input.value = option;
+
+                input.id = `option-${index}`;
+
+                const span = document.createElement('span');
+
+                const optionLetter = String.fromCharCode(65 + index); // A, B, C, D...
+                span.textContent = `${optionLetter}. ${option}`;
+
+                label.appendChild(input);
+                label.appendChild(span);
+                optionsContainer.appendChild(label);
+            });
+            nextButton.textContent = (currentQuestionIndex === quizData.length - 1) ? "Submit Quiz" : "Next Question";
+        }
+
+        async function checkAnswer() {
+            if (!isQuizActive) return;
+
+            const selectedOption = document.querySelector('input[name="answer"]:checked');
+            
+            if (!selectedOption) {
+                validationMessage.textContent = "Please select an answer before proceeding!";
+                
+                await speak("Please select an answer before proceeding!", "Fenrir");
+                return;
+            }
+            validationMessage.textContent = ''; 
+
+            const userAnswer = selectedOption.value;
+            const correctAnswer = quizData[currentQuestionIndex].correct;
+
+            if (userAnswer === correctAnswer) {
+                score++;
+                
+                console.log(`Correct! Current score: ${score}`);
+            } else {
+                console.log(`Incorrect. The correct answer was: ${correctAnswer}`);
+            }
+
+            currentQuestionIndex++;
+            loadQuestion();
+        }
+
+        function showResults() {
+            isQuizActive = false;
+            quizContent.classList.add('hidden');
+            resultsContainer.classList.remove('hidden');
+            finalScore.textContent = `${score} / ${quizData.length}`;
+            
+            // Generate audio feedback based on score
+            const percentage = (score / quizData.length) * 100;
+            let voiceMessage;
+            if (percentage === 100) {
+                voiceMessage = "Say cheerfully: Amazing! You got a perfect score!";
+            } else if (percentage >= 50) {
+                voiceMessage = `Say informatively: You scored ${score} out of ${quizData.length}. That's a great effort!`;
+            } else {
+                voiceMessage = "Say gently: You scored below average. Keep practicing, you'll get there!";
+            }
+            speak(voiceMessage, "Puck");
+        }
+
+        function restartQuiz() {
+            currentQuestionIndex = 0;
+            score = 0;
+            isQuizActive = true;
+            quizContent.classList.remove('hidden');
+            resultsContainer.classList.add('hidden');
+            loadQuestion();
+        }
+
+        async function speak(text, voice) {
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=`;
+            const apiKey = ""; 
+
+            const payload = {
+                contents: [{
+                    parts: [{ text: text }]
+                }],
+                generationConfig: {
+                    responseModalities: ["AUDIO"],
+                    speechConfig: {
+                        voiceConfig: {
+                            prebuiltVoiceConfig: { voiceName: voice }
+                        }
+                    }
+                },
+                model: "gemini-2.5-flash-preview-tts"
+            };
+
+            const maxRetries = 3;
+            for (let attempt = 0; attempt < maxRetries; attempt++) {
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`API returned status ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    const part = result?.candidates?.[0]?.content?.parts?.[0];
+                    const audioData = part?.inlineData?.data;
+                    const mimeType = part?.inlineData?.mimeType;
+
+                    if (audioData && mimeType && mimeType.startsWith("audio/L16")) {
+                        const sampleRateMatch = mimeType.match(/rate=(\d+)/);
+                        const sampleRate = sampleRateMatch ? parseInt(sampleRateMatch[1], 10) : 24000;
+                        
+                        // Convert base64 to PCM buffer
+                        const pcmDataBuffer = base64ToArrayBuffer(audioData);
+                        const pcm16 = new Int16Array(pcmDataBuffer);
+                        
+                        // Convert PCM to WAV format
+                        const wavBlob = pcmToWav(pcm16, sampleRate);
+                        const audioUrl = URL.createObjectURL(wavBlob);
+                        
+                        // Play the audio
+                        const audio = new Audio(audioUrl);
+                        audio.play();
+                        return; // Success, exit function
+                    } else {
+                        throw new Error("Invalid audio data received from API.");
+                    }
+                } catch (error) {
+                    console.error(`TTS API attempt ${attempt + 1} failed:`, error);
+                    if (attempt < maxRetries - 1) {
+                        // Exponential backoff wait
+                        await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempt) * 1000));
+                    }
+                }
+            }
+            console.error("Failed to play TTS audio after multiple retries.");
+        }
+
+        window.onload = loadQuestion;
+
+    </script>
 </body>
 </html>
