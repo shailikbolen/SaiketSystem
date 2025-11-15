@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responsive Grid Layout</title>
+    <!-- Load Tailwind CSS CDN for utility-first styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Link to the external CSS file -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="min-h-screen p-4 md:p-8">
+
+    <div class="space-y-4 lg:grid lg:grid-cols-4 lg:gap-4 lg:space-y-0 max-w-7xl mx-auto">
+
+        <header class="content-section bg-indigo-600 text-white lg:col-span-4">
+            <h1 class="text-3xl font-bold">Responsive Web Application Header</h1>
+            <p class="mt-1 text-indigo-200">This layout adapts smoothly from mobile to desktop.</p>
+        </header>
+        <aside class="content-section bg-white border border-gray-200 lg:col-span-1">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Sidebar Navigation</h2>
+            <nav>
+                <ul class="space-y-2">
+                    <li><a href="#" class="block text-indigo-600 hover:text-indigo-800 font-medium">Dashboard</a></li>
+                    <li><a href="#" class="block text-indigo-600 hover:text-indigo-800 font-medium">Analytics</a></li>
+                    <li><a href="#" class="block text-indigo-600 hover:text-indigo-800 font-medium">Settings</a></li>
+                    <li><a href="#" class="block text-indigo-600 hover:text-indigo-800 font-medium">Reports</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="content-section bg-white border border-gray-200 lg:col-span-3">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-3">Main Content Area</h2>
+            <p class="text-gray-600 mb-4">
+                This area contains the primary information. On smaller screens, this section stacks neatly below the sidebar.
+            </p>
+
+            <h3 class="text-xl font-medium mb-2">Responsiveness Details</h3>
+            <div class="p-3 bg-gray-50 rounded-lg text-sm">
+                <p class="font-semibold">Current Layout Mode:</p>
+                <ul class="list-disc list-inside ml-4 mt-1 space-y-1">
+                    <li class="hidden sm:block lg:hidden text-orange-600">Tablet/Small Desktop: Still stacking full width.</li>
+                    <li class="block lg:hidden text-red-600">Mobile/Stacking: Full width sections.</li>
+                    <li class="hidden lg:block text-green-600">Desktop/Grid: Sidebar (25%) and Main (75%) are side-by-side.</li>
+                </ul>
+                <p class="mt-2 text-xs">Try resizing your browser window to see the transition!</p>
+            </div>
+            <div class="mt-4 p-4 bg-indigo-50 border-l-4 border-indigo-500 rounded-lg">
+                <p class="text-indigo-700">The grid structure is activated using the `lg:` prefix, which typically corresponds to a screen width of 1024px or larger.</p>
+            </div>
+        </main>
+
+        <footer class="content-section bg-gray-700 text-white text-center lg:col-span-4">
+            <p class="text-sm">
+                &copy; 2025 Responsive Layout Design | All Rights Reserved.
+            </p>
+        </footer>
+
+    </div>
+</body>
+</html>
